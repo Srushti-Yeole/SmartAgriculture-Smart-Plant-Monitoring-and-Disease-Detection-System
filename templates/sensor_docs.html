@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Setup Documentation</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8faf5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        h1 {
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2ecc71;
+        }
+        h2 {
+            font-size: 22px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+            margin-top: 25px;
+        }
+        p, ul, ol {
+            margin-bottom: 15px;
+        }
+        code {
+            background-color: #e9ecef;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(52,152,219,0.3);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2ecc71;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .hamburger-btn:hover {
+            background: #27ae60;
+            transform: scale(1.05);
+        }
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(135deg, #1b4332, #2ecc71);
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            padding-top: 80px;
+            overflow-y: auto;
+        }
+        .mobile-menu.active {
+            right: 0;
+        }
+        .mobile-menu a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .mobile-menu a:hover {
+            background-color: #95d5b2;
+            color: #1b4332;
+            padding-left: 30px;
+        }
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .menu-overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <button class="hamburger-btn" id="hamburger-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="{{ url_for('home') }}"><i class="fas fa-home me-2"></i>Home</a>
+        <a href="{{ url_for('tools_page') }}"><i class="fas fa-tools me-2"></i>Tools</a>
+        <a href="{{ url_for('leaf_index') }}"><i class="fas fa-leaf me-2"></i>Leaf Disease</a>
+        <a href="{{ url_for('seed_index') }}"><i class="fas fa-dna me-2"></i>Seed Analysis</a>
+        <a href="{{ url_for('live_advice') }}"><i class="fas fa-comments me-2"></i>Live Advice</a>
+        <a href="{{ url_for('why_tools') }}"><i class="fas fa-star me-2"></i>Why Choose</a>
+    </div>
+    <div class="menu-overlay" id="menu-overlay"></div>
+    <div class="container">
+        <h1>Sensor Setup Documentation</h1>
+
+        <p>This page provides guidance on setting up an ESP32 or similar microcontrollers to send sensor data to this application. You can either configure your sensor to send data directly to this frontend (if you set a custom URL), or to a backend endpoint that then makes it available to the frontend.</p>
+
+        <h2>1. Recommended Sensor Data Format</h2>
+        <p>Your sensor endpoint should return JSON data in one of the following formats:</p>
+        <pre><code>// Option 1: Single data point (most recent)
+{
+    "temperature": 25.5,
+    "humidity": 60.2,
+    "soil_moisture": 180 
+}
+
+// Option 2: Array of data points (most recent will be used)
+[
+    {
+        "timestamp": "2024-07-28 10:30:00",
+        "temperature": 25.5,
+        "humidity": 60.2,
+        "soil_moisture": 180 
+    },
+    {
+        "timestamp": "2024-07-28 10:35:00",
+        "temperature": 25.8,
+        "humidity": 61.0,
+        "soil_moisture": 185 
+    }
+]</code></pre>
+        <p>Ensure that the keys <code>temperature</code>, <code>humidity</code>, and <code>soil_moisture</code> are present. Soil moisture should be a raw analog reading (e.g., 0-1023 or 0-255).</p>
+
+        <h2>2. Basic ESP32 Setup (Arduino IDE Example)</h2>
+        <p>Here's a basic example of how you might set up an ESP32 to read sensor data (e.g., from a DHT11/DHT22 for temp/humidity and a capacitive soil moisture sensor) and expose it via a simple web server.</p>
+        <h3>Required Libraries:</h3>
+        <ul>
+            <li><code>WiFi</code></li>
+            <li><code>WebServer</code> (for ESP32) or <code>ESP8266WebServer</code> (for ESP8266)</li>
+            <li><code>DHT sensor library</code> (if using DHT11/DHT22)</li>
+        </ul>
+        <h3>Example Code (<code>.ino</code> file):</h3>
+        <p>This code creates a simple web server on your ESP32 that serves sensor data as JSON when you access its IP address.</p>
+        <pre><code id="arduino-code-block">#include &lt;WiFi.h&gt;
+#include &lt;WebServer.h&gt;
+#include &lt;DHT.h&gt;
+#include &lt;ArduinoJson.h&gt; // You might need to install this library too
+
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+
+WebServer server(80);
+
+#define DHTPIN 4     // DHT data pin
+#define DHTTYPE DHT11   // DHT 11 or DHT22
+DHT dht(DHTPIN, DHTTYPE);
+
+#define SOIL_MOISTURE_PIN 34 // Analog pin for soil moisture sensor
+
+void handleRoot() {
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  int soilMoisture = analogRead(SOIL_MOISTURE_PIN); // Reads 0-4095 on ESP32
+
+  // Check if any reads failed and exit early (to avoid NaN)
+  if (isNaN(h) || isNaN(t)) {
+    server.send(500, "application/json", "{\"error\":\"Failed to read from DHT sensor!\"}");
+    return;
+  }
+
+  StaticJsonDocument<200> doc;
+  doc["temperature"] = t;
+  doc["humidity"] = h;
+  doc["soil_moisture"] = soilMoisture; 
+
+  String output;
+  serializeJson(doc, output);
+
+  server.send(200, "application/json", output);
+}
+
+void setup() {
+  Serial.begin(115200);
+  dht.begin();
+
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi...");
+  }
+  Serial.println(WiFi.localIP()); // Print IP address to Serial Monitor
+
+  server.on("/data", handleRoot); // Set up endpoint for /data
+  server.begin();
+}
+
+void loop() {
+  server.handleClient();
+}</code></pre>
+        <button id="copy-code-btn" class="btn btn-primary btn-sm">Copy Code</button>
+        <button id="download-code-btn" class="btn btn-info btn-sm">Download .ino</button>
+        <p><strong>Remember to replace <code>YOUR_WIFI_SSID</code> and <code>YOUR_WIFI_PASSWORD</code> with your actual Wi-Fi credentials.</strong> Also, adjust the <code>DHTPIN</code> and <code>SOIL_MOISTURE_PIN</code> according to your wiring.</p>
+        <p>After uploading this code to your ESP32, open the Serial Monitor to find its assigned IP address. You can then configure this IP address (e.g., <code>http://192.168.1.100/data</code>) in the "Configure Sensor" modal in the main application.</p>
+
+        <h2>3. Publishing Data to a Central Server (Advanced)</h2>
+        <p>For more robust solutions, especially if your ESP32 is not directly accessible from the web (e.g., behind a firewall or NAT), you might want to send data to a central server or IoT platform (like Thingspeak, Adafruit IO, or a custom Flask endpoint).</p>
+        <p>If you implement a custom Flask endpoint on your server to receive data from ESP32, you can then configure the "Fetch Sensor" button to hit that Flask endpoint. Your Flask endpoint would receive POST requests from the ESP32 and store the data (e.g., in a database or a JSON file) which the frontend can then retrieve.</p>
+
+        <a href="/seed_size" class="back-button">Back to Agricultural Predictor</a>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const arduinoCodeBlock = document.getElementById('arduino-code-block');
+            const copyCodeBtn = document.getElementById('copy-code-btn');
+            const downloadCodeBtn = document.getElementById('download-code-btn');
+
+            if (copyCodeBtn) {
+                copyCodeBtn.addEventListener('click', function() {
+                    const code = arduinoCodeBlock.textContent;
+                    navigator.clipboard.writeText(code).then(function() {
+                        alert('Code copied to clipboard!');
+                    }, function(err) {
+                        console.error('Failed to copy code: ', err);
+                    });
+                });
+            }
+
+            if (downloadCodeBtn) {
+                downloadCodeBtn.addEventListener('click', function() {
+                    const code = arduinoCodeBlock.textContent;
+                    const blob = new Blob([code], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'esp32_sensor_code.ino'; // Suggest a filename
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            }
+        });
+        
+        // Hamburger menu functionality
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuOverlay = document.getElementById('menu-overlay');
+        
+        if (hamburgerBtn) {
+            hamburgerBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('active');
+                menuOverlay.classList.toggle('active');
+            });
+        }
+        
+        if (menuOverlay) {
+            menuOverlay.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                menuOverlay.classList.remove('active');
+            });
+        }
+        
+        // Close menu when clicking menu items
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                menuOverlay.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html> 

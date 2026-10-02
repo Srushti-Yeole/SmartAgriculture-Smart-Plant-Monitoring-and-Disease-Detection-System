@@ -1,0 +1,9 @@
+Flask
+Werkzeug
+transformers==4.27.3
+Pillow
+torch
+pandas
+gunicorn
+requests
+scikit-learn 

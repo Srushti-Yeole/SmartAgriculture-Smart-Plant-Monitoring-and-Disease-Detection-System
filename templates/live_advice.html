@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Advisory Services</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-green: #2d6a4f;
+            --secondary-green: #40916c;
+            --light-green: #95d5b2;
+            --dark-green: #1b4332;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .page-header {
+            background: linear-gradient(135deg, #1b4332, #2d6a4f, #40916c);
+            color: white;
+            padding: 35px 0;
+            text-align: center;
+            margin-bottom: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="%23ffffff15"><path d="M17.66 8L12 2.35 6.34 8C4.78 9.56 4 11.64 4 13.64s.78 4.11 2.34 5.67 3.61 2.35 5.66 2.35 4.1-.79 5.66-2.35S20 15.64 20 13.64 19.22 9.56 17.66 8zM6 14c.01-2 .62-3.27 1.76-4.4L12 5.27l4.24 4.38C17.38 10.77 17.99 12 18 14H6z"/></svg>');
+            background-repeat: space;
+            opacity: 0.07;
+            z-index: 0;
+        }
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        .page-header h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            margin-bottom: 0;
+            letter-spacing: 0.3px;
+        }
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-green);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .hamburger-btn:hover {
+            background: var(--secondary-green);
+            transform: scale(1.05);
+        }
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(135deg, #1b4332, #2d6a4f);
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            padding-top: 80px;
+            overflow-y: auto;
+        }
+        .mobile-menu.active {
+            right: 0;
+        }
+        .mobile-menu a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .mobile-menu a:hover {
+            background-color: var(--light-green);
+            color: var(--dark-green);
+            padding-left: 30px;
+        }
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .menu-overlay.active {
+            display: block;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 15px;
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+        main {
+            flex: 1;
+        }
+        .content-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .advice-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--primary-green);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        .advice-card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            transform: translateY(-3px);
+        }
+        .advice-card h3 {
+            color: var(--primary-green);
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .advice-card h3 i {
+            font-size: 1.5rem;
+        }
+        .advice-card p {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+        .advice-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .advice-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #555;
+        }
+        .advice-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--primary-green);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .btn-primary {
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: var(--secondary-green);
+            border-color: var(--secondary-green);
+            transform: translateY(-2px);
+        }
+        footer {
+            margin-top: 60px;
+            padding: 30px 0;
+            background: #1b4332;
+            color: white;
+            text-align: center;
+        }
+        footer p {
+            margin-bottom: 0;
+        }
+        .weather-section {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            border-left: 5px solid var(--primary-green);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        .weather-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            color: var(--primary-green);
+        }
+        .weather-content {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .weather-info {
+            flex: 1;
+            min-width: 250px;
+        }
+        .weather-advice {
+            color: var(--dark-green);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .weather-advice-item {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 5px;
+        }
+        .weather-loading {
+            color: var(--primary-green);
+            font-style: italic;
+        }
+        .chatbot-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--primary-green);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        .chatbot-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: var(--primary-green);
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+        .chatbot-header i {
+            font-size: 1.5rem;
+        }
+        .chatbot-container {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+        }
+        .chatbot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .chat-message {
+            display: flex;
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .message-avatar.bot {
+            background: var(--primary-green);
+            color: white;
+        }
+        .message-avatar.user {
+            background: var(--light-green);
+            color: var(--dark-green);
+        }
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        .message-bubble.bot {
+            background: #e8f5e9;
+            color: #333;
+            border-left: 3px solid var(--primary-green);
+        }
+        .message-bubble.user {
+            background: var(--primary-green);
+            color: white;
+            margin-left: auto;
+        }
+        .chatbot-input-wrapper {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+        .chatbot-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .chatbot-input:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 5px rgba(45, 106, 79, 0.2);
+        }
+        .chatbot-send-btn {
+            padding: 12px 20px;
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .chatbot-send-btn:hover {
+            background: var(--secondary-green);
+            transform: translateY(-2px);
+        }
+        .chatbot-send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <button class="hamburger-btn" id="hamburger-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="{{ url_for('home') }}"><i class="fas fa-home me-2"></i>Home</a>
+            <a href="{{ url_for('tools_page') }}"><i class="fas fa-tools me-2"></i>Tools</a>
+            <a href="{{ url_for('leaf_index') }}"><i class="fas fa-leaf me-2"></i>Leaf Disease</a>
+            <a href="{{ url_for('seed_index') }}"><i class="fas fa-dna me-2"></i>Seed Analysis</a>
+            <a href="{{ url_for('live_advice') }}"><i class="fas fa-comments me-2"></i>Live Advice</a>
+            <a href="{{ url_for('why_tools') }}"><i class="fas fa-star me-2"></i>Why Choose</a>
+        </div>
+        <div class="menu-overlay" id="menu-overlay"></div>
+        <div class="header-content">
+            <h1>Live Advisory Services</h1>
+            <p>Expert farming guidance and real-time recommendations for your agricultural needs</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="content-container">
+            <!-- Weather Advice Section -->
+            <div class="weather-section" id="weather-section">
+                <div class="weather-content">
+                    <i class="fas fa-cloud-sun weather-icon"></i>
+                    <div class="weather-info">
+                        <div class="weather-advice">🌦️ Weather Advice:</div>
+                        <div class="weather-loading">Loading weather data...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Chatbot Section -->
+            <div class="chatbot-section">
+                <div class="chatbot-header">
+                    <i class="fas fa-robot"></i>
+                    Live Agricultural Assistant
+                </div>
+                <div class="chatbot-container">
+                    <div class="chatbot-messages" id="chatbot-messages">
+                        <div class="chat-message">
+                            <div class="message-avatar bot">🤖</div>
+                            <div class="message-bubble bot">
+                                Hello! I'm your agricultural advisor. Ask me anything about farming, crop disease, seed analysis, or weather-related concerns. How can I help you today?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chatbot-input-wrapper">
+                        <input 
+                            type="text" 
+                            class="chatbot-input" 
+                            id="chatbot-input" 
+                            placeholder="Ask me about farming tips, diseases, seeds, irrigation..."
+                            autocomplete="off"
+                        >
+                        <button class="chatbot-send-btn" id="chatbot-send-btn">
+                            <i class="fas fa-paper-plane me-2"></i>Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="advice-card">
+                <h3><i class="fas fa-lightbulb"></i>Quick Farming Tips</h3>
+                <p>Get instant recommendations based on current conditions:</p>
+                <ul class="advice-list">
+                    <li>Optimal weather conditions for pesticide application</li>
+                    <li>Soil preparation techniques for your region</li>
+                    <li>Best planting schedules by season</li>
+                    <li>Water management strategies</li>
+                    <li>Nutrient deficiency identification</li>
+                </ul>
+            </div>
+
+            <div class="advice-card">
+                <h3><i class="fas fa-stethoscope"></i>Disease Management</h3>
+                <p>Expert guidance on identifying and treating plant diseases:</p>
+                <ul class="advice-list">
+                    <li>Early disease detection techniques</li>
+                    <li>Organic treatment options</li>
+                    <li>Chemical solutions with proper safety measures</li>
+                    <li>Prevention strategies with best practices</li>
+                    <li>Crop rotation recommendations</li>
+                </ul>
+            </div>
+
+            <div class="advice-card">
+                <h3><i class="fas fa-leaf"></i>Crop Selection Guide</h3>
+                <p>Choose the right crops for your specific conditions:</p>
+                <ul class="advice-list">
+                    <li>Region-specific crop recommendations</li>
+                    <li>Season-appropriate crop varieties</li>
+                    <li>Soil compatibility analysis</li>
+                    <li>Market demand trends</li>
+                    <li>Yield optimization tips</li>
+                </ul>
+            </div>
+
+            <div class="advice-card">
+                <h3><i class="fas fa-droplet"></i>Water & Irrigation Management</h3>
+                <p>Optimize water usage for maximum crop efficiency:</p>
+                <ul class="advice-list">
+                    <li>Irrigation scheduling based on weather</li>
+                    <li>Water conservation techniques</li>
+                    <li>Soil moisture monitoring</li>
+                    <li>Drainage solutions for waterlogged fields</li>
+                    <li>Cost-effective irrigation methods</li>
+                </ul>
+            </div>
+
+            <div class="advice-card">
+                <h3><i class="fas fa-chart-line"></i>Weather-Based Planning</h3>
+                <p>Make informed decisions based on weather forecasts:</p>
+                <ul class="advice-list">
+                    <li>Weather impact on crop health</li>
+                    <li>Monsoon preparation strategies</li>
+                    <li>Frost and drought management</li>
+                    <li>Storm preparedness and recovery</li>
+                    <li>Seasonal weather predictions and planning</li>
+                </ul>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{{ url_for('tools_page') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-arrow-right me-2"></i>Explore Our Tools
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Agricultural Analysis Suite. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch weather data and provide farming advice
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    
+                    fetch(`/api/weather-proxy?lat=${lat}&lon=${lon}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const weatherCode = data.weathercode || 0;
+                            const temperature = data.temperature || 'N/A';
+                            const windspeed = data.windspeed || 0;
+                            
+                            let advice = getWeatherAdvice(weatherCode, temperature, windspeed);
+                            updateWeatherSection(temperature, advice);
+                        })
+                        .catch(error => {
+                            console.log('Weather fetch error:', error);
+                            updateWeatherSection('N/A', [
+                                '✓ Monitor local weather conditions',
+                                '✓ Plan your agricultural activities accordingly'
+                            ]);
+                        });
+                }, function() {
+                    // Geolocation denied, show generic advice
+                    updateWeatherSection('N/A', [
+                        '✓ Monitor local weather conditions',
+                        '✓ Plan your agricultural activities accordingly'
+                    ]);
+                });
+            }
+            
+            function getWeatherAdvice(weatherCode, temp, windspeed) {
+                let advice = [];
+                
+                // WMO Weather interpretation codes
+                if (weatherCode === 0 || weatherCode === 1) {
+                    advice.push('✓ Clear weather: Good for spraying pesticides');
+                    advice.push('✓ Ideal conditions for field operations');
+                } else if (weatherCode === 2 || weatherCode === 3) {
+                    advice.push('⚠️ Partly cloudy: Monitor conditions before spraying');
+                    advice.push('✓ Can proceed with careful planning');
+                } else if (weatherCode >= 45 && weatherCode <= 48) {
+                    advice.push('🌫️ Foggy conditions: Avoid pesticide spraying');
+                    advice.push('⚠️ Visibility is reduced, postpone spraying activities');
+                } else if (weatherCode >= 51 && weatherCode <= 67) {
+                    advice.push('🌧️ Rain or drizzle detected: Avoid spraying pesticides');
+                    advice.push('⚠️ Wait for rain to stop before spraying');
+                } else if (weatherCode >= 71 && weatherCode <= 77) {
+                    advice.push('❄️ Snow fall: Postpone all outdoor operations');
+                    advice.push('⚠️ Not suitable for field work');
+                } else if (weatherCode >= 80 && weatherCode <= 82) {
+                    advice.push('🌧️ Rain showers: Avoid spraying pesticides');
+                    advice.push('⚠️ Wait for weather to clear');
+                } else if (weatherCode === 85 || weatherCode === 86) {
+                    advice.push('❄️ Heavy snow showers: Cancel field operations');
+                    advice.push('⚠️ Not suitable for any outdoor work');
+                } else if (weatherCode >= 80 && weatherCode <= 99) {
+                    advice.push('⛈️ Thunderstorm: Avoid all outdoor activities');
+                    advice.push('⚠️ Do not spray, wait for clear weather');
+                } else {
+                    advice.push('✓ Monitor local weather conditions');
+                    advice.push('✓ Proceed with caution based on observations');
+                }
+                
+                if (windspeed > 15) {
+                    advice.push('💨 High wind detected: Reduce or postpone spraying');
+                }
+                
+                if (temp !== 'N/A' && temp < 5) {
+                    advice.push('❄️ Low temperature: Avoid pesticide application');
+                } else if (temp > 30) {
+                    advice.push('🌡️ High temperature: Early morning or evening spraying recommended');
+                }
+                
+                return advice;
+            }
+            
+            function updateWeatherSection(temp, adviceList) {
+                const weatherSection = document.getElementById('weather-section');
+                if (!weatherSection) return;
+                
+                let adviceHTML = '<div class="weather-advice">🌦️ Weather Advice:</div>';
+                
+                if (temp !== 'N/A') {
+                    adviceHTML += `<div style="color: var(--primary-green); font-weight: 600; margin-bottom: 10px;">🌡️ Temperature: ${temp}°C</div>`;
+                }
+                
+                adviceList.forEach(item => {
+                    adviceHTML += `<div class="weather-advice-item">${item}</div>`;
+                });
+                
+                weatherSection.innerHTML = `
+                    <div class="weather-content">
+                        <i class="fas fa-cloud-sun weather-icon"></i>
+                        <div class="weather-info">
+                            ${adviceHTML}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Hamburger menu functionality
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuOverlay = document.getElementById('menu-overlay');
+            
+            if (hamburgerBtn) {
+                hamburgerBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('active');
+                    menuOverlay.classList.toggle('active');
+                });
+            }
+            
+            if (menuOverlay) {
+                menuOverlay.addEventListener('click', function() {
+                    mobileMenu.classList.remove('active');
+                    menuOverlay.classList.remove('active');
+                });
+            }
+            
+            // Close menu when clicking menu items
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.remove('active');
+                    menuOverlay.classList.remove('active');
+                });
+            });
+
+            // Chatbot functionality
+            const chatbotInput = document.getElementById('chatbot-input');
+            const chatbotSendBtn = document.getElementById('chatbot-send-btn');
+            const chatbotMessages = document.getElementById('chatbot-messages');
+
+            const botResponses = {
+                'disease': [
+                    'For plant disease management, identify the symptoms first: yellowing leaves, brown spots, wilting, or mold growth. Use fungicides for fungal diseases and neem oil for organic pest control.',
+                    'Early detection is key! Inspect leaves regularly for discoloration, spots, or unusual growth. Quarantine affected plants and remove infected leaves to prevent spread.',
+                    'Common diseases include powdery mildew, leaf rust, and blight. Each requires different treatment: spray fungicides, ensure proper air circulation, and avoid overwatering.'
+                ],
+                'seed': [
+                    'Good quality seeds should be uniform in size, color, and have no visible damage. Store seeds in cool, dry places and test germination rate before planting.',
+                    'Seed analysis helps predict germination potential and yield. Our seed analysis tool can help you evaluate seed quality quickly.',
+                    'For better germination, pre-soak large seeds, maintain soil moisture, and ensure proper temperature (20-25°C for most crops).'
+                ],
+                'weather': [
+                    'Weather significantly affects farming operations. Clear weather is ideal for pesticide application, while rain requires postponing spraying.',
+                    'Monitor temperature: below 5°C avoid pesticides, above 30°C apply pesticides in early morning or evening to prevent crop burn.',
+                    'Wind speed above 15 km/h can reduce pesticide effectiveness and cause drift. Wait for calm conditions for optimal results.'
+                ],
+                'irrigation': [
+                    'Irrigation scheduling depends on soil type and weather. Sandy soil needs frequent, light watering while clay soil needs less frequent but deeper watering.',
+                    'Check soil moisture before watering: dig 2 inches deep. If it feels moist, wait before watering. Over-watering can cause root diseases.',
+                    'Use drip irrigation for efficiency, run early morning or evening to reduce evaporation. Monitor weather to adjust irrigation schedules.'
+                ],
+                'pest': [
+                    'For pest management, identify the pest first. Common pests include aphids, armyworms, and spider mites. Use neem oil for organic control or approved pesticides.',
+                    'Prevention is better than control: maintain crop hygiene, practice crop rotation, use resistant varieties, and encourage natural predators.',
+                    'Monitor crops regularly for pest signs: wilting, holes on leaves, sticky residue, or webbing. Early intervention prevents major losses.'
+                ],
+                'soil': [
+                    'Good soil preparation is crucial. Test soil for pH (optimal 6.0-7.0), nitrogen, phosphorus, and potassium levels. Add organic matter to improve soil health.',
+                    'Soil types: sandy soil drains quickly and needs frequent watering, clay soil retains water and needs good drainage, loamy soil is ideal for most crops.',
+                    'Crop rotation prevents soil depletion. Rotate crops annually or use legumes to fix nitrogen naturally in the soil.'
+                ],
+                'fertilizer': [
+                    'Fertilizers provide NPK (Nitrogen, Phosphorus, Potassium). Nitrogen promotes leaf growth, phosphorus root development, potassium disease resistance.',
+                    'Organic fertilizers like compost improve soil health long-term. Chemical fertilizers give quick results but can deplete soil over time.',
+                    'Apply fertilizer based on crop needs: leafy crops need more nitrogen, root crops need phosphorus. Follow recommended dosage to avoid over-fertilization.'
+                ],
+                'default': [
+                    'I\'m your agricultural advisor! Ask me about: crop diseases, seed quality, weather conditions, irrigation, pest management, soil health, or fertilization.',
+                    'Feel free to ask anything related to farming. I can help with plant care, disease identification, weather analysis, or general agricultural tips.',
+                    'How can I assist you today? Ask about diseases, pests, irrigation, seeds, weather, soil preparation, or any farming concern you have.'
+                ]
+            };
+
+            function generateBotResponse(userMessage) {
+                const lowerMessage = userMessage.toLowerCase();
+                
+                for (const [keyword, responses] of Object.entries(botResponses)) {
+                    if (keyword !== 'default' && lowerMessage.includes(keyword)) {
+                        return responses[Math.floor(Math.random() * responses.length)];
+                    }
+                }
+                
+                return botResponses.default[Math.floor(Math.random() * botResponses.default.length)];
+            }
+
+            function addChatMessage(message, isUser) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'chat-message';
+                
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = `message-avatar ${isUser ? 'user' : 'bot'}`;
+                avatarDiv.textContent = isUser ? '👨‍🌾' : '🤖';
+                
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = `message-bubble ${isUser ? 'user' : 'bot'}`;
+                bubbleDiv.textContent = message;
+                
+                messageDiv.appendChild(avatarDiv);
+                messageDiv.appendChild(bubbleDiv);
+                chatbotMessages.appendChild(messageDiv);
+                
+                // Scroll to latest message
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            }
+
+            function sendChatMessage() {
+                const message = chatbotInput.value.trim();
+                if (!message) return;
+                
+                // Add user message
+                addChatMessage(message, true);
+                chatbotInput.value = '';
+                chatbotSendBtn.disabled = true;
+                
+                // Simulate bot thinking time
+                setTimeout(() => {
+                    const botResponse = generateBotResponse(message);
+                    addChatMessage(botResponse, false);
+                    chatbotSendBtn.disabled = false;
+                    chatbotInput.focus();
+                }, 600);
+            }
+
+            // Send message on button click
+            if (chatbotSendBtn) {
+                chatbotSendBtn.addEventListener('click', sendChatMessage);
+            }
+
+            // Send message on Enter key
+            if (chatbotInput) {
+                chatbotInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendChatMessage();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
